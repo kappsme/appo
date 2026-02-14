@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Reservar Cita - APPO{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-2 fade-in">
+                <i class="bi bi-calendar-plus"></i> Reserva tu Cita
+            </h1>
+            <p class="lead text-muted">Selecciona una fecha y hora disponible</p>
+        </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm slide-up">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Calendario</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Date Navigation -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <button class="btn btn-outline-primary" id="prevDay">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </button>
+                        <h4 class="mb-0" id="currentDate">Cargando...</h4>
+                        <button class="btn btn-outline-primary" id="nextDay">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Time Slots Grid -->
+                    <div id="timeSlotsContainer">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-check"></i> Confirmar Cita
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm">
+                    <!-- Appointment Details -->
+                    <div class="alert alert-info mb-3">
+                        <strong><i class="bi bi-info-circle"></i> Fecha y Hora:</strong><br>
+                        <span id="modalDateTime">-</span>
+                    </div>
+
+                    <!-- Client Name -->
+                    <div class="mb-3">
+                        <label for="clientName" class="form-label">
+                            <i class="bi bi-person"></i> Nombre Completo *
+                        </label>
+                        <input type="text" class="form-control" id="clientName" required 
+                               placeholder="Ingresa tu nombre completo">
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="mb-3">
+                        <label for="clientPhone" class="form-label">
+                            <i class="bi bi-telephone"></i> Teléfono *
+                        </label>
+                        <input type="tel" class="form-control" id="clientPhone" required 
+                               placeholder="+1234567890">
+                    </div>
+
+                    <!-- Service -->
+                    <div class="mb-3">
+                        <label for="serviceSelect" class="form-label">
+                            <i class="bi bi-briefcase"></i> Servicio *
+                        </label>
+                        <select class="form-select" id="serviceSelect" required>
+                            <option value="">Selecciona un servicio</option>
+                        </select>
+                    </div>
+
+                    <!-- Recurrence -->
+                    <div class="mb-3">
+                        <label for="recurrenceSelect" class="form-label">
+                            <i class="bi bi-arrow-repeat"></i> Recurrencia
+                        </label>
+                        <select class="form-select" id="recurrenceSelect">
+                            <option value="none">Sin recurrencia</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="monthly">Mensual</option>
+                        </select>
+                    </div>
+
+                    <!-- Recurrence End Date (hidden initially) -->
+                    <div class="mb-3" id="recurrenceEndGroup" style="display: none;">
+                        <label for="recurrenceEnd" class="form-label">
+                            <i class="bi bi-calendar-x"></i> Fecha Fin Recurrencia *
+                        </label>
+                        <input type="date" class="form-control" id="recurrenceEnd">
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-3">
+                        <label for="appointmentNotes" class="form-label">
+                            <i class="bi bi-chat-left-text"></i> Notas (Opcional)
+                        </label>
+                        <textarea class="form-control" id="appointmentNotes" rows="2" 
+                                  placeholder="Información adicional..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmBooking">
+                    <i class="bi bi-check-circle"></i> Confirmar Cita
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle"></i> ¡Cita Reservada!
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="display-1 text-success mb-3">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h4>¡Tu cita ha sido reservada exitosamente!</h4>
+                <p class="text-muted" id="successMessage">Recibirás una confirmación en tu correo.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}
