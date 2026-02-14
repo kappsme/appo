@@ -43,8 +43,14 @@ cd appo
 cp .env.example .env
 
 # Editar .env con tus configuraciones
+# IMPORTANTE: Cambia las contraseñas y SECRET_KEY antes de usar en producción
 nano .env
 ```
+
+**⚠️ IMPORTANTE:** Para uso en producción, asegúrate de:
+- Cambiar `SECRET_KEY` por una clave aleatoria y segura
+- Usar contraseñas fuertes para MySQL (`DB_PASSWORD` y `MYSQL_ROOT_PASSWORD`)
+- Configurar `FLASK_ENV=production` y `DEBUG=False`
 
 ### 3. Iniciar con Docker Compose
 ```bash

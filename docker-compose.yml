@@ -5,14 +5,14 @@ services:
     image: mysql:5.7.40
     container_name: appo_db
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: appointments_db
-      MYSQL_USER: appo_user
-      MYSQL_PASSWORD: appo_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-appointments_db}
+      MYSQL_USER: ${DB_USER:-appo_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-appo_password}
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     networks:
       - appo_network
     healthcheck:
@@ -25,18 +25,19 @@ services:
     container_name: appo_web
     environment:
       - FLASK_APP=app.py
-      - FLASK_ENV=development
+      - FLASK_ENV=${FLASK_ENV:-development}
       - DB_HOST=db
-      - DB_PORT=3306
-      - DB_NAME=appointments_db
-      - DB_USER=appo_user
-      - DB_PASSWORD=appo_password
-      - SECRET_KEY=dev-secret-key-change-in-production
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_NAME=${DB_NAME:-appointments_db}
+      - DB_USER=${DB_USER:-appo_user}
+      - DB_PASSWORD=${DB_PASSWORD:-appo_password}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+      - DEBUG=${DEBUG:-True}
     volumes:
       - ./backend:/app
       - ./frontend:/app/frontend
     ports:
-      - "5000:5000"
+      - "${WEB_PORT:-5000}:5000"
     depends_on:
       db:
         condition: service_healthy
