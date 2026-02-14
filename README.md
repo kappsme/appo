@@ -1,27 +1,27 @@
 # 📅 APPO - Appointment Booking Application
 
-Una aplicación web moderna para agendamiento de citas con panel de administración, notificaciones por correo y gestión avanzada de disponibilidad.
+Una aplicación web moderna y completa para agendamiento de citas con panel de administración, notificaciones por correo y gestión avanzada de disponibilidad.
 
 ## ✨ Características
 
-- 📅 Calendario interactivo día a día
-- ⏰ Configuración flexible de horarios y duración de citas
-- 🔄 Citas recurrentes (semanal/mensual)
-- 📧 Notificaciones automáticas por correo
-- 📱 Diseño completamente responsive
-- 🎨 Interfaz moderna con Bootstrap 5.3
-- ✨ Animaciones fluidas y transiciones
-- 🐳 Deploy fácil con Docker
-- 🔒 Validaciones robustas
-- 📊 Panel de administración intuitivo
+- 📅 **Calendario Interactivo:** Sistema día a día con navegación intuitiva
+- ⏰ **Horarios Flexibles:** Configuración personalizada por día de la semana
+- 🔄 **Citas Recurrentes:** Soporte para citas semanales y mensuales
+- 📧 **Notificaciones:** Sistema automático de confirmación por correo
+- 📱 **Responsive Design:** Optimizado para dispositivos móviles y táctiles
+- 🎨 **Interfaz Moderna:** Bootstrap 5.3 con animaciones fluidas
+- 🎚️ **Controles Avanzados:** noUiSlider para gestión táctil de horarios
+- 🐳 **Fácil Deploy:** Configuración completa con Docker Compose
+- 🔒 **Validaciones:** Sistema robusto de prevención de conflictos
+- 📊 **Panel Admin:** Gestión completa de servicios, horarios y citas
 
 ## 🛠️ Stack Tecnológico
 
-- **Backend:** Flask 3.0.3 + Python 3.13
-- **Frontend:** Bootstrap 5.3 + JavaScript Vanilla
+- **Backend:** Flask 3.0.3 + Python 3.13 + SQLAlchemy
+- **Frontend:** Bootstrap 5.3 + JavaScript Vanilla + noUiSlider
 - **Base de Datos:** MySQL 5.7.40
 - **Deploy:** Docker + Docker Compose
-- **Emails:** Flask-Mail + SMTP
+- **Emails:** Flask-Mail (configurable con SMTP)
 
 ## 📋 Requisitos Previos
 
@@ -37,19 +37,29 @@ git clone https://github.com/kappsme/appo.git
 cd appo
 ```
 
-### 2. Iniciar con Docker Compose
+### 2. Configurar Variables de Entorno (Opcional)
 ```bash
-docker-compose up -d
+# Copiar archivo de ejemplo
+cp .env.example .env
+
+# Editar .env con tus configuraciones
+nano .env
 ```
 
-### 3. Crear Base de Datos (primera vez)
+### 3. Iniciar con Docker Compose
 ```bash
-docker-compose exec web python
->>> from app import app, db
->>> with app.app_context():
-...     db.create_all()
->>> exit()
+# Construir e iniciar servicios
+docker compose up --build
+
+# O en modo detached (segundo plano)
+docker compose up -d --build
 ```
+
+El sistema se iniciará automáticamente y:
+- Creará la base de datos
+- Inicializará las tablas
+- Cargará datos de ejemplo (servicios y horarios por defecto)
+- Estará listo para usar en http://localhost:5000
 
 ### 4. Acceder a la Aplicación
 
@@ -58,161 +68,291 @@ docker-compose exec web python
 
 ## 📱 Estructura del Proyecto
 
-``` 
+```
 appo/
 ├── backend/
-│   ├── app.py                 # Aplicación Flask principal
-│   ├── models.py              # Modelos de BD (SQLAlchemy)
-│   ├── config.py              # Configuración
-│   ├── email_service.py       # Servicio de notificaciones
-│   ├── validators.py          # Validaciones personalizadas
-│   ├── requirements.txt        # Dependencias Python
-│   ├── Dockerfile             # Imagen Docker
-│   └── init_db.py             # Script inicialización BD
+│   ├── app.py                      # Aplicación Flask principal
+│   ├── models.py                   # Modelos SQLAlchemy (BD)
+│   ├── config.py                   # Configuración
+│   ├── init_db.py                  # Script de inicialización BD
+│   ├── requirements.txt            # Dependencias Python
+│   ├── Dockerfile                  # Imagen Docker backend
+│   └── utils/
+│       ├── validators.py           # Validaciones
+│       ├── email_service.py        # Servicio de correos
+│       └── recurrence.py           # Lógica de recurrencia
 │
 ├── frontend/
 │   ├── templates/
-│   │   ├── base.html          # Plantilla base
-│   │   ├── index.html         # Página cliente
-│   │   ├── admin.html         # Panel administrador
-│   │   └── 404.html           # Página error
-│   │
+│   │   ├── base.html               # Plantilla base
+│   │   ├── index.html              # Página cliente
+│   │   ├── admin.html              # Panel administrador
+│   │   └── 404.html                # Página error
 │   └── static/
 │       ├── css/
-│       │   ├── styles.css     # Estilos principales
-│       │   └── animations.css # Animaciones
-│       │
+│       │   ├── styles.css          # Estilos principales
+│       │   ├── animations.css      # Animaciones
+│       │   └── admin.css           # Estilos admin
 │       └── js/
-│           ├── script.js      # Lógica cliente
-│           ├── admin.js       # Lógica admin
-│           └── utils.js       # Funciones utilitarias
+│           ├── script.js           # Lógica cliente
+│           └── admin.js            # Lógica admin
 │
-└── docker-compose.yml         # Configuración Docker
+├── docker-compose.yml              # Orquestación de servicios
+├── .env.example                    # Variables de entorno ejemplo
+├── .gitignore                      # Archivos a ignorar
+└── README.md                       # Documentación
 ```
 
 ## 🎯 Guía de Uso
 
 ### Para Clientes
 
-1. Selecciona una fecha en el calendario
-2. Elige un horario disponible
-3. Completa tu información (nombre, teléfono, servicio)
-4. Confirma tu cita en el modal
-5. Recibe confirmación por correo
+1. **Seleccionar Fecha:** Usa los botones de navegación para elegir un día
+2. **Elegir Horario:** Haz clic en un slot disponible (verde)
+3. **Completar Información:**
+   - Nombre completo
+   - Teléfono
+   - Selecciona un servicio
+   - Opcional: Configura recurrencia (semanal/mensual)
+   - Opcional: Agrega notas
+4. **Confirmar Cita:** Revisa los datos y confirma
+5. **Recibir Confirmación:** El sistema registra la cita
 
 ### Para Administrador
 
-1. Accede a `/admin`
-2. **Horarios:** Define disponibilidad por día de la semana
-3. **Servicios:** Crea y gestiona servicios ofrecidos
-4. **Citas:** Visualiza, modifica o cancela citas
-5. **Reportes:** Ve estadísticas y ocupación
+#### Gestión de Citas
+- **Ver Citas:** Lista completa de todas las citas
+- **Filtrar:** Por fecha y estado (activas/canceladas/completadas)
+- **Ver Detalles:** Click en el botón 👁️ para ver información completa
+- **Cancelar:** Click en el botón ❌ para cancelar una cita
+
+#### Gestión de Servicios
+- **Crear Servicio:** Click en "Nuevo Servicio"
+  - Nombre del servicio
+  - Descripción
+  - Duración (minutos)
+  - Precio
+  - Estado (activo/inactivo)
+- **Editar:** Click en el botón ✏️
+- **Eliminar:** Click en el botón 🗑️ (desactiva el servicio)
+
+#### Configuración de Disponibilidad
+- **Agregar Disponibilidad:** Click en "Agregar Disponibilidad"
+  - Selecciona día de la semana
+  - Usa el slider para definir horario de inicio y fin
+  - Define duración de cada cita
+  - Habilita/deshabilita el día
+- **Editar:** Click en "Editar" en cada día
+- **Eliminar:** Click en botón de eliminar
 
 ## 🔧 Configuración
 
 ### Variables de Entorno
 
-Crear archivo `.env` en raíz (opcional):
+Las siguientes variables pueden configurarse en `.env`:
 
-```
-FLASK_ENV=production
+```bash
+# Flask
+FLASK_ENV=development          # production en producción
+SECRET_KEY=tu-clave-secreta   # Cambiar en producción
+DEBUG=True
+
+# Base de Datos
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=appointments_db
+DB_USER=appo_user
+DB_PASSWORD=appo_password
+
+# Email (Opcional - para notificaciones)
 MAIL_SERVER=smtp.gmail.com
 MAIL_PORT=587
+MAIL_USE_TLS=True
 MAIL_USERNAME=tu_email@gmail.com
-MAIL_PASSWORD=tu_password
+MAIL_PASSWORD=tu_app_password
 MAIL_DEFAULT_SENDER=noreply@appo.com
 ```
 
-### Configurar Correos
+### Configurar Notificaciones por Correo
 
-Editar `backend/config.py`:
+Para habilitar las notificaciones por email:
 
-```python
-MAIL_SERVER = "smtp.gmail.com"
-MAIL_PORT = 587
-MAIL_USERNAME = "tu_email@gmail.com"
-MAIL_PASSWORD = "tu_contraseña_app"
-```
+1. Configura un servidor SMTP (ej: Gmail con contraseña de aplicación)
+2. Edita las variables en `.env` o `backend/config.py`
+3. Descomenta el código de envío en `backend/utils/email_service.py`
+
+**Nota:** Por defecto, los emails se registran en logs sin enviarse.
 
 ## 📊 Modelos de Datos
 
 ### Appointment (Cita)
 - `id`: ID único
-- `date`: Fecha
-- `time`: Hora
-- `client`: Nombre cliente
-- `phone`: Teléfono
-- `service_id`: ID servicio
+- `date`: Fecha de la cita
+- `time`: Hora de la cita
+- `client`: Nombre del cliente
+- `phone`: Teléfono del cliente
+- `service_id`: ID del servicio
 - `recurrence`: Tipo (none/weekly/monthly)
-- `recurrence_end`: Fecha fin recurrencia
-- `created_at`: Timestamp creación
-- `status`: active/cancelled
-
-### Availability (Disponibilidad)
-- `id`: ID único
-- `day_of_week`: Día semana (0-6)
-- `start_time`: Hora inicio
-- `end_time`: Hora fin
-- `duration_minutes`: Duración cita
-- `enabled`: Habilitado/deshabilitado
+- `recurrence_end`: Fecha fin de recurrencia
+- `parent_appointment_id`: ID de cita padre (para recurrentes)
+- `status`: Estado (active/cancelled/completed)
+- `notes`: Notas adicionales
+- `created_at`: Fecha de creación
+- `updated_at`: Fecha de actualización
 
 ### Service (Servicio)
 - `id`: ID único
-- `name`: Nombre servicio
+- `name`: Nombre del servicio
 - `description`: Descripción
-- `duration`: Duración por defecto
-- `price`: Precio (opcional)
+- `duration`: Duración en minutos
+- `price`: Precio del servicio
 - `active`: Activo/inactivo
+- `created_at`: Fecha de creación
+
+### Availability (Disponibilidad)
+- `id`: ID único
+- `day_of_week`: Día de la semana (0-6)
+- `start_time`: Hora de inicio
+- `end_time`: Hora de fin
+- `duration_minutes`: Duración de cada cita
+- `enabled`: Habilitado/deshabilitado
+- `created_at`: Fecha de creación
+
+### RecurrenceRule (Reglas de Recurrencia)
+- `id`: ID único
+- `appointment_id`: ID de la cita
+- `frequency`: Frecuencia (daily/weekly/monthly)
+- `interval`: Intervalo
+- `count`: Número de ocurrencias
+- `until`: Fecha de finalización
+- `by_day`: Días específicos
+- `created_at`: Fecha de creación
 
 ## 🔐 Seguridad
 
-- Validación de datos en frontend y backend
-- Prevención de conflictos de horarios
-- Sanitización de inputs
-- Headers de seguridad CSRF
-- Rate limiting en API (opcional)
+- ✅ Validación de datos en frontend y backend
+- ✅ Prevención de conflictos de horarios
+- ✅ Sanitización de inputs
+- ✅ Validación de números de teléfono
+- ✅ Verificación de disponibilidad antes de confirmar
+- ✅ Protección contra duplicados
 
 ## 📧 Notificaciones
 
-Se envían correos automáticos para:
+El sistema soporta envío de correos para:
 - ✅ Confirmación de cita reservada
-- ✅ Recordatorio 24h antes
+- ✅ Recordatorio 24h antes (requiere configuración adicional)
 - ✅ Confirmación de cancelación
-- ✅ Cambios en horarios (admin)
+- ✅ Notificación de cambios (admin)
 
-## 🐳 Comandos Docker
+## 🐳 Comandos Docker Útiles
 
 ```bash
 # Iniciar servicios
-docker-compose up -d
+docker compose up -d
 
 # Ver logs
-docker-compose logs -f web
+docker compose logs -f web
+
+# Ver logs de base de datos
+docker compose logs -f db
 
 # Detener servicios
-docker-compose down
+docker compose down
 
-# Recrear base de datos
-docker-compose down -v
-docker-compose up -d
+# Detener y eliminar volúmenes (reinicio completo)
+docker compose down -v
 
-# Acceder a shell de BD
-docker-compose exec db mysql -u appo_user -p appointments_db
+# Reconstruir contenedores
+docker compose up --build
+
+# Acceder a shell del contenedor web
+docker compose exec web bash
+
+# Acceder a MySQL
+docker compose exec db mysql -u appo_user -p appointments_db
+# Password: appo_password
+
+# Ejecutar comandos en el contenedor
+docker compose exec web python init_db.py
+```
+
+## 🧪 Desarrollo Local (sin Docker)
+
+Si prefieres ejecutar sin Docker:
+
+```bash
+# 1. Instalar dependencias
+cd backend
+pip install -r requirements.txt
+
+# 2. Configurar base de datos MySQL
+# Crear base de datos 'appointments_db'
+
+# 3. Configurar variables de entorno
+export DB_HOST=localhost
+export DB_USER=tu_usuario
+export DB_PASSWORD=tu_password
+
+# 4. Inicializar base de datos
+python init_db.py
+
+# 5. Ejecutar aplicación
+flask run
+
+# La aplicación estará en http://localhost:5000
 ```
 
 ## 🚀 Despliegue en Producción
 
-1. Cambiar `FLASK_ENV` a `production`
-2. Generar `SECRET_KEY` seguro
-3. Configurar SMTP válido
-4. Usar reverse proxy (nginx)
-5. Configurar SSL/HTTPS
-6. Backup automático de BD
+Para despliegue en producción:
 
-## 📞 Soporte
+1. **Cambiar configuraciones de seguridad:**
+   ```bash
+   FLASK_ENV=production
+   DEBUG=False
+   SECRET_KEY=clave-secreta-aleatoria-muy-larga
+   ```
 
-Para reportar problemas, crear un issue en el repositorio.
+2. **Usar contraseñas seguras para MySQL**
+
+3. **Configurar SMTP real** para notificaciones
+
+4. **Usar proxy inverso** (nginx) con SSL/HTTPS
+
+5. **Configurar backups automáticos** de la base de datos
+
+6. **Considerar uso de:** Gunicorn + nginx para producción
+
+## 🤝 Contribuir
+
+Las contribuciones son bienvenidas! Por favor:
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 🐛 Reporte de Problemas
+
+Para reportar problemas o solicitar nuevas características, por favor crea un issue en el repositorio.
 
 ## 📄 Licencia
 
-MIT License - Ver archivo LICENSE
+Este proyecto está bajo la Licencia MIT - ver el archivo LICENSE para detalles.
+
+## 👥 Autor
+
+**kappsme** - [GitHub](https://github.com/kappsme)
+
+## 🙏 Agradecimientos
+
+- Bootstrap por el framework CSS
+- Flask por el framework web
+- noUiSlider por los controles de rango avanzados
+- La comunidad open source
+
+---
+
+**⭐ Si te gusta este proyecto, por favor dale una estrella en GitHub! ⭐**
