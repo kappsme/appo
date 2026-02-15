@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__, 
-            template_folder='../frontend/templates',
-            static_folder='../frontend/static')
+            template_folder='frontend/templates',
+            static_folder='frontend/static')
 app.config.from_object(Config)
 
 # Initialize extensions

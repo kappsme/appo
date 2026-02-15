@@ -31,7 +31,6 @@ instance/
 .webassets-cache
 
 # Environment Variables
-.env
 .env.local
 
 # IDE

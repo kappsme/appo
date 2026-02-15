@@ -2,17 +2,23 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:5.7.40
-    container_name: appo_db
+    image: mysql:8.0-oracle
+    env_file:
+      - .env 
+    hostname: ${MYSQL_HOST}
+    working_dir: /db
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    command: mysqld --innodb_use_native_aio=0
     environment:
+      MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
       MYSQL_DATABASE: ${DB_NAME:-appointments_db}
       MYSQL_USER: ${DB_USER:-appo_user}
       MYSQL_PASSWORD: ${DB_PASSWORD:-appo_password}
+    container_name: appo_db
     volumes:
       - db_data:/var/lib/mysql
-    ports:
-      - "${DB_PORT:-3306}:3306"
     networks:
       - appo_network
     healthcheck:
@@ -46,7 +52,7 @@ services:
     command: >
       sh -c "
         echo 'Waiting for database...' &&
-        sleep 10 &&
+        sleep 5 &&
         python init_db.py &&
         flask run --host=0.0.0.0
       "
